@@ -1,5 +1,5 @@
 [package]
-name = "changeme_lib_name"
+name = "tracing-utils"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -13,12 +13,13 @@ doctest = false
 bench = false
 doc = true
 
-# [[bin|example|test|bench]]
-# name = ""
-# path = ""
-# required-features
-
 [features]
-default = []
+default = ["file", "tree"]
+file = []
+tree = []
 
 [dependencies]
+tracing = "0.1"
+tracing-appender = { version = "0.2", features = ["parking_lot"] }
+tracing-subscriber = { version = "0.3", features = ["parking_lot", "env-filter"] }
+tracing-tree = "0.2"

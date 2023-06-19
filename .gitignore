@@ -11,3 +11,6 @@ Cargo.lock
 
 # Advisory DB
 .cargo/advisory-db
+
+# Env file
+.env

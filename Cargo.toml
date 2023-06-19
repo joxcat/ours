@@ -9,8 +9,8 @@ default-members = ["lib/*", "bin/*"]
 resolver = "2"
 
 [workspace.package]
-authors = ["changeme <changeme@example.org>s"]
-version = "0.0.0-changeme"
+authors = ["Johan <dev@johan.moe>"]
+version = "0.1.0"
 edition = "2021"
 license = "MPL-2.0"
 license-file = "LICENSE"
