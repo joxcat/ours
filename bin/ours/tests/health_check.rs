@@ -1,8 +1,8 @@
 #[tokio::test]
 async fn health_check_works() {
-    let _ = ours::test_helpers::setup_server().await;
+    let address = ours::test_helpers::setup_server().await;
 
-    let resp = reqwest::get("http://127.0.0.1:8000/health_check")
+    let resp = reqwest::get(format!("{address}/health_check"))
         .await
         .expect("Failed to make request");
     assert_eq!(resp.status(), 200);
