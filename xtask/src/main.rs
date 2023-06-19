@@ -21,6 +21,8 @@ type Result<T> = eyre::Result<T>;
 enum Command {
     /// Install cargo requirements
     Setup,
+    /// Run dev pipeline (watcher)
+    Dev,
     /// Run any additional checks that are required on CI
     Ci,
     /// Package the software and produce a set of distributable artifacts
@@ -46,7 +48,7 @@ fn main() -> Result<()> {
                     "sh",
                     "-c",
                     format!(
-                        "if ! command -v {name} >/dev/null; then {cargo} install {name}{} {}; fi",
+                        "if ! command -v {name} >/dev/null; then {cargo} install --locked {name}{} {}; fi",
                         version.map_or_else(|| "".to_string(), |version| format!("@{version}")),
                         features.map_or_else(
                             || "".to_string(),
@@ -59,6 +61,9 @@ fn main() -> Result<()> {
             install_if_not_found("cargo-audit", Some("fix"), None).run()?;
             install_if_not_found("cargo-about", None, None).run()?;
             install_if_not_found("cargo-deny", None, None).run()?;
+            install_if_not_found("cargo-watch", None, None).run()?;
+            #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+            install_if_not_found("cargo-tarpaulin", None, None).run()?;
         }
         Command::License => {
             cmd!(
@@ -81,7 +86,7 @@ fn main() -> Result<()> {
             .run()?;
         }
         Command::Ci => {
-            cmd!("sh", "-c", format!("{cargo} nextest run")).run()?;
+            // Dependencies checking
             cmd!(
                 "sh",
                 "-c",
@@ -95,6 +100,15 @@ fn main() -> Result<()> {
             )
             .run()?;
             cmd!("sh", "-c", format!("{cargo} audit")).run()?;
+            // Formatting check
+            cmd!("sh", "-c", format!("{cargo} fmt -- --check")).run()?;
+            // Linting
+            cmd!("sh", "-c", format!("{cargo} clippy -- -D warnings")).run()?;
+            // Tests
+            cmd!("sh", "-c", format!("{cargo} nextest run")).run()?;
+            // Code coverage
+            #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+            cmd!("sh", "-c", format!("{cargo} tarpaulin --ignore-tests")).run()?;
         }
         Command::Dist => {
             cmd!(
@@ -131,6 +145,14 @@ fn main() -> Result<()> {
                 "sh",
                 "-c",
                 format!("rm {workspace_root}/README.md.orig.* {workspace_root}/README.md.toc.*")
+            )
+            .run()?;
+        }
+        Command::Dev => {
+            cmd!(
+                "sh",
+                "-c",
+                format!("{cargo} watch -x clippy -x 'nextest run' -x run")
             )
             .run()?;
         }
