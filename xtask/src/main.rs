@@ -31,6 +31,9 @@ enum Command {
     License,
     /// Generate the table of content in the README.md
     Toc,
+    /// Check coverage
+    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+    Coverage,
 }
 
 fn main() -> Result<()> {
@@ -107,8 +110,9 @@ fn main() -> Result<()> {
             // Tests
             cmd!("sh", "-c", format!("{cargo} nextest run")).run()?;
             // Code coverage
-            #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
-            cmd!("sh", "-c", format!("{cargo} tarpaulin --ignore-tests")).run()?;
+            // TODO: Is it really useful
+            // #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+            // cmd!("sh", "-c", format!("{cargo} tarpaulin --ignore-tests")).run()?;
         }
         Command::Dist => {
             cmd!(
@@ -153,6 +157,16 @@ fn main() -> Result<()> {
                 "sh",
                 "-c",
                 format!("{cargo} watch -x clippy -x 'nextest run' -x run")
+            )
+            .run()?;
+        }
+        #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+        Command::Coverage => {
+            // TODO: Does not seems to be useful
+            cmd!(
+                "sh",
+                "-c",
+                format!("{cargo} tarpaulin --ignore-tests --target-dir target/tarpaulin")
             )
             .run()?;
         }

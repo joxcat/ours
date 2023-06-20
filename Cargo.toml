@@ -3,9 +3,10 @@ members = [
     "xtask", 
     "lib/*",
     "bin/*",
+    "tests",
     # "examples/*",
 ]
-default-members = ["lib/*", "bin/*"]
+default-members = ["lib/*", "bin/*", "tests"]
 resolver = "2"
 
 [workspace.package]

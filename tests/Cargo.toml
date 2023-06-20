@@ -1,0 +1,17 @@
+[package]
+name = "tests"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+ours = { path = "../bin/ours" }
+tokio = { version = "1.28", default-features = false }
+tracing-subscriber = "0.3"
+
+[dev-dependencies]
+reqwest = { version = "0.11", features = ["hyper-rustls", "rustls"], default-features = false }
+assay = { version = "^0.1", git = "https://github.com/joxcat/assay.git" }
+test-case = "3.1"
