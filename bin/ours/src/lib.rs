@@ -1,11 +1,13 @@
-use std::net::TcpListener;
+use std::{net::TcpListener, path::PathBuf, str::FromStr, fs};
 
 use axum::{
     http::StatusCode,
     routing::{get, post},
     Form, Router,
 };
+use sea_orm::{ConnectOptions, Database};
 use serde::Deserialize;
+use tracing::log::LevelFilter;
 
 #[tracing::instrument]
 async fn health_check() -> StatusCode {
@@ -27,6 +29,16 @@ async fn register(Form(payload): Form<RegisterForm>) -> StatusCode {
 
 #[tracing::instrument]
 pub async fn run(listener: TcpListener) -> eyre::Result<()> {
+    let path = "database.sqlite";
+    let mut opt = ConnectOptions::new(format!("sqlite://{path}"));
+    opt.sqlx_logging(true)
+        .sqlx_logging_level(LevelFilter::Debug);
+
+    if !PathBuf::from_str(path)?.exists() {
+        fs::File::create(path)?;
+    }
+    let db = Database::connect(opt).await?;
+
     let router = Router::new()
         .route("/health_check", get(health_check))
         .route("/register", post(register));

@@ -1,6 +1,6 @@
 #[cfg(feature = "file")]
 use tracing_appender::non_blocking::WorkerGuard;
-use tracing_subscriber::{fmt, EnvFilter, Layer};
+use tracing_subscriber::{fmt::{self, format::FmtSpan}, EnvFilter, Layer};
 #[cfg(feature = "tree")]
 use tracing_tree::HierarchicalLayer;
 
@@ -15,6 +15,8 @@ where
         .with_ansi(true)
         .with_line_number(false)
         .with_file(false)
+        .with_thread_names(true)
+        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
 }
 
 /// Add an environment filter based on the `LOG_LEVEL` env variable to the subscriber.
@@ -36,7 +38,6 @@ where
     HierarchicalLayer::new(indent_amount)
         .with_bracketed_fields(true)
         .with_thread_names(false)
-        .with_indent_lines(true)
         .with_thread_ids(false)
         .with_targets(true)
 }

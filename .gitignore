@@ -14,3 +14,6 @@ Cargo.lock
 
 # Env file
 .env
+
+# Databases
+*.sqlite
