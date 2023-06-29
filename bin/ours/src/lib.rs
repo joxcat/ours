@@ -1,4 +1,4 @@
-use std::{net::TcpListener, path::PathBuf, str::FromStr, fs};
+use std::{fs, net::TcpListener, path::PathBuf, str::FromStr};
 
 use axum::{
     http::StatusCode,
@@ -37,7 +37,7 @@ pub async fn run(listener: TcpListener) -> eyre::Result<()> {
     if !PathBuf::from_str(path)?.exists() {
         fs::File::create(path)?;
     }
-    let db = Database::connect(opt).await?;
+    let _db = Database::connect(opt).await?;
 
     let router = Router::new()
         .route("/health_check", get(health_check))

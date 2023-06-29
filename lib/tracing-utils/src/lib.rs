@@ -1,6 +1,9 @@
 #[cfg(feature = "file")]
 use tracing_appender::non_blocking::WorkerGuard;
-use tracing_subscriber::{fmt::{self, format::FmtSpan}, EnvFilter, Layer};
+use tracing_subscriber::{
+    fmt::{self, format::FmtSpan},
+    EnvFilter, Layer,
+};
 #[cfg(feature = "tree")]
 use tracing_tree::HierarchicalLayer;
 

@@ -23,6 +23,8 @@ enum Command {
     Setup,
     /// Run dev pipeline (watcher)
     Dev,
+    /// Create new migration
+    NewMigration { migration_name: String },
     /// Run any additional checks that are required on CI
     Ci,
     /// Package the software and produce a set of distributable artifacts
@@ -41,7 +43,10 @@ fn main() -> Result<()> {
         .ok()
         .and_then(|var| if var.is_empty() { None } else { Some(var) })
         .unwrap_or_else(|| "cargo".to_string());
-    let workspace_root: String = std::env::var("CARGO_WORKSPACE_DIR").unwrap();
+    let workspace_root: String = std::env::var("CARGO_WORKSPACE_DIR")
+        .unwrap()
+        .trim_end_matches("/")
+        .to_string();
     color_eyre::install().unwrap();
 
     match Command::parse() {
@@ -67,6 +72,7 @@ fn main() -> Result<()> {
             install_if_not_found("cargo-watch", None, None).run()?;
             #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
             install_if_not_found("cargo-tarpaulin", None, None).run()?;
+            install_if_not_found("sea-orm-cli", None, None).run()?;
         }
         Command::License => {
             cmd!(
@@ -169,6 +175,9 @@ fn main() -> Result<()> {
                 format!("{cargo} tarpaulin --ignore-tests --target-dir target/tarpaulin")
             )
             .run()?;
+        }
+        Command::NewMigration { migration_name } => {
+            cmd!("sh", "-c", format!("sea-orm-cli migrate generate --migration-dir={workspace_root}/lib/migration {migration_name}")).run()?;
         }
     };
 

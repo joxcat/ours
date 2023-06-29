@@ -2,6 +2,7 @@
 ignore = [
 	"RUSTSEC-2021-0141", # TODO: Use something else or fork dotenv
 	"RUSTSEC-2021-0145", # Potential only
+	"RUSTSEC-2022-0090", # Only when applying migrations
 ]
 
 [database]
